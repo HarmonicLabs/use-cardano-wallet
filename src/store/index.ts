@@ -1,13 +1,14 @@
-import { bech32 } from 'bech32';
 import produce from 'immer';
 import create from 'zustand';
 
 import { NetworkId, WalletApi, WalletName } from '../typescript/cip30';
-import { fromHex, parseBalance, toWalletInfo } from '../utils';
+import { parseBalance, toWalletInfo } from '../utils';
+import { fromHex } from '@harmoniclabs/uint8array-utils';
+import { encodeBech32 } from '@harmoniclabs/crypto';
 
 export interface WalletInfo {
   name: WalletName;
-  icon: string;
+  icon?: string | undefined;
   displayName: string;
 }
 
@@ -133,28 +134,24 @@ export const useStore = create<State>()((set, get) => ({
       let [rewardAddress] = await api.getRewardAddresses();
 
       if (rewardAddress) {
-        const buf = fromHex(rewardAddress);
-        const words = bech32.toWords(buf);
-        rewardAddress = bech32.encode(
+        const buf = fromHex( rewardAddress );
+        rewardAddress = encodeBech32(
           buf[0] === NetworkId.MAINNET ? 'stake' : 'stake_test',
-          words,
-          130
+          buf.slice(1)
         );
       }
 
-      const address = fromHex(rawAddress);
+      const addressBytes = fromHex( rawAddress );
       const balance = await api.getBalance();
 
-      const decodedBalance = parseBalance(balance);
-      const words = bech32.toWords(address);
+      const decodedBalance = parseBalance( balance );
 
-      const bechAddr = bech32.encode(
-        address[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
-        words,
-        130
+      const bechAddr = encodeBech32(
+        addressBytes[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
+        addressBytes.slice( 1 )
       );
 
-      localStorage.setItem(localStorageKey, walletName);
+      localStorage.setItem( localStorageKey, walletName );
 
       set(
         produce((draft: State) => {
@@ -164,7 +161,7 @@ export const useStore = create<State>()((set, get) => ({
           draft.lovelaceBalance = decodedBalance;
           draft.rewardAddress = rewardAddress;
           draft.address = bechAddr;
-          draft.network = address[0] as NetworkId;
+          draft.network = addressBytes[0] as NetworkId;
           draft.connectedWallet = toWalletInfo(walletName);
         })
       );
