@@ -7,172 +7,172 @@ import { fromHex } from '@harmoniclabs/uint8array-utils';
 import { encodeBech32 } from '@harmoniclabs/crypto';
 
 export interface WalletInfo {
-  name: WalletName;
-  icon?: string | undefined;
-  displayName: string;
+	name: WalletName;
+	icon?: string | undefined;
+	displayName: string;
 }
 
 export type State = {
-  isConnected: boolean;
-  isConnecting: boolean;
-  isRefetchingBalance: boolean;
+	isConnected: boolean;
+	isConnecting: boolean;
+	isRefetchingBalance: boolean;
 
-  detectedWallets: WalletInfo[];
+	detectedWallets: WalletInfo[];
 
-  address: null | string;
+	address: null | string;
 
-  rewardAddress: null | string;
+	rewardAddress: null | string;
 
-  /**
-   * The wallet that was selected to connect.
-   */
-  selectedWallet: null | WalletInfo;
+	/**
+	 * The wallet that was selected to connect.
+	 */
+	selectedWallet: null | WalletInfo;
 
-  /**
-   * The wallet that is currently connected.
-   */
-  connectedWallet: null | WalletInfo;
+	/**
+	 * The wallet that is currently connected.
+	 */
+	connectedWallet: null | WalletInfo;
 
-  lovelaceBalance: null | number;
-  api: null | WalletApi;
-  network: null | NetworkId;
+	lovelaceBalance: null | number;
+	api: null | WalletApi;
+	network: null | NetworkId;
 
-  connect: (walletName: WalletName, localStorageKey: string) => Promise<void>;
-  getDetectedWallets: () => void;
-  disconnect: () => void;
-  refetchBalance: () => Promise<void>;
+	connect: (walletName: WalletName, localStorageKey: string) => Promise<void>;
+	getDetectedWallets: () => void;
+	disconnect: () => void;
+	refetchBalance: () => Promise<void>;
 };
 
 const defaults = {
-  isConnecting: false,
-  isConnected: false,
-  detectedWallets: [],
-  address: null,
-  lovelaceBalance: null,
-  api: null,
-  selectedWallet: null,
-  connectedWallet: null,
-  network: null,
-  isRefetchingBalance: false,
-  rewardAddress: null,
+	isConnecting: false,
+	isConnected: false,
+	detectedWallets: [],
+	address: null,
+	lovelaceBalance: null,
+	api: null,
+	selectedWallet: null,
+	connectedWallet: null,
+	network: null,
+	isRefetchingBalance: false,
+	rewardAddress: null,
 };
 
 export const useStore = create<State>()((set, get) => ({
-  ...defaults,
-  disconnect: () => {
-    set((prev: State) => {
-      return {
-        ...defaults,
-        // Keep detected wallets
-        detectedWallets: prev.detectedWallets,
-      };
-    });
-  },
+	...defaults,
+	disconnect: () => {
+		set((prev: State) => {
+			return {
+				...defaults,
+				// Keep detected wallets
+				detectedWallets: prev.detectedWallets,
+			};
+		});
+	},
 
-  refetchBalance: async () => {
-    const api = get().api;
+	refetchBalance: async () => {
+		const api = get().api;
 
-    if (api === null) return;
+		if (api === null) return;
 
-    set(
-      produce((draft: State) => {
-        draft.isRefetchingBalance = true;
-      })
-    );
+		set(
+			produce((draft: State) => {
+				draft.isRefetchingBalance = true;
+			})
+		);
 
-    const balance = await api.getBalance();
-    const lovelace = parseBalance(balance);
+		const balance = await api.getBalance();
+		const lovelace = parseBalance(balance);
 
-    set(
-      produce((draft: State) => {
-        draft.isRefetchingBalance = false;
-        draft.lovelaceBalance = lovelace;
-      })
-    );
-  },
+		set(
+			produce((draft: State) => {
+				draft.isRefetchingBalance = false;
+				draft.lovelaceBalance = lovelace;
+			})
+		);
+	},
 
-  getDetectedWallets: async () => {
-    if (typeof window === 'undefined' || !(window as any).cardano) {
-      return;
-    }
+	getDetectedWallets: async () => {
+		if (typeof window === 'undefined' || !(window as any).cardano) {
+			return;
+		}
 
-    const ns = (window as any).cardano;
+		const ns = (window as any).cardano;
 
-    set(
-      produce((draft: State) => {
-        draft.detectedWallets = Object.keys(ns)
-          .filter(ns => Object.values(WalletName).includes(ns as WalletName))
-          .map(n => toWalletInfo(n as WalletName));
-      })
-    );
-  },
+		set(
+			produce((draft: State) => {
+				draft.detectedWallets = Object.keys(ns)
+					.filter((ns) => Object.values(WalletName).includes(ns as WalletName))
+					.map((n) => toWalletInfo(n as WalletName));
+			})
+		);
+	},
 
-  connect: async (walletName: WalletName, localStorageKey: string) => {
-    set(
-      produce((draft: State) => {
-        draft.isConnecting = true;
-        draft.selectedWallet = toWalletInfo(walletName);
-      })
-    );
+	connect: async (walletName: WalletName, localStorageKey: string) => {
+		set(
+			produce((draft: State) => {
+				draft.isConnecting = true;
+				draft.selectedWallet = toWalletInfo(walletName);
+			})
+		);
 
-    try {
-      // Exit early if the Cardano dApp-Wallet Web Bridge (CIP 30) has not been injected
-      // This can happen in a SSR scenario for example
-      if (typeof window === 'undefined' || !(window as any).cardano) {
-        throw Error('window.cardano is undefined');
-      }
+		try {
+			// Exit early if the Cardano dApp-Wallet Web Bridge (CIP 30) has not been injected
+			// This can happen in a SSR scenario for example
+			if (typeof window === 'undefined' || !(window as any).cardano) {
+				throw Error('window.cardano is undefined');
+			}
 
-      const api: WalletApi = await (window as any).cardano[walletName].enable();
-      let rawAddress = await api.getChangeAddress();
-      if (!rawAddress) {
-        [rawAddress] = await api.getUsedAddresses();
-      }
-      if (!rawAddress) {
-        [rawAddress] = await api.getUnusedAddresses();
-      }
+			const api: WalletApi = await (window as any).cardano[walletName].enable();
+			let rawAddress = await api.getChangeAddress();
+			if (!rawAddress) {
+				[rawAddress] = await api.getUsedAddresses();
+			}
+			if (!rawAddress) {
+				[rawAddress] = await api.getUnusedAddresses();
+			}
 
-      let [rewardAddress] = await api.getRewardAddresses();
+			let [rewardAddress] = await api.getRewardAddresses();
 
-      if (rewardAddress) {
-        const buf = fromHex( rewardAddress );
-        rewardAddress = encodeBech32(
-          buf[0] === NetworkId.MAINNET ? 'stake' : 'stake_test',
-          buf.slice(1)
-        );
-      }
+			if (rewardAddress) {
+				const buf = fromHex(rewardAddress);
+				rewardAddress = encodeBech32(
+					buf[0] === NetworkId.MAINNET ? 'stake' : 'stake_test',
+					buf.slice(1)
+				);
+			}
 
-      const addressBytes = fromHex( rawAddress );
-      const balance = await api.getBalance();
+			const addressBytes = fromHex(rawAddress);
+			const balance = await api.getBalance();
 
-      const decodedBalance = parseBalance( balance );
+			const decodedBalance = parseBalance(balance);
 
-      const bechAddr = encodeBech32(
-        addressBytes[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
-        addressBytes.slice( 1 )
-      );
+			const bechAddr = encodeBech32(
+				addressBytes[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
+				addressBytes.slice(1)
+			);
 
-      localStorage.setItem( localStorageKey, walletName );
+			localStorage.setItem(localStorageKey, walletName);
 
-      set(
-        produce((draft: State) => {
-          draft.isConnecting = false;
-          draft.isConnected = true;
-          draft.api = api;
-          draft.lovelaceBalance = decodedBalance;
-          draft.rewardAddress = rewardAddress;
-          draft.address = bechAddr;
-          draft.network = addressBytes[0] as NetworkId;
-          draft.connectedWallet = toWalletInfo(walletName);
-        })
-      );
-    } catch (e) {
-      console.error(e);
-      set(
-        produce((draft: State) => {
-          draft.isConnecting = false;
-          draft.selectedWallet = null;
-        })
-      );
-    }
-  },
+			set(
+				produce((draft: State) => {
+					draft.isConnecting = false;
+					draft.isConnected = true;
+					draft.api = api;
+					draft.lovelaceBalance = decodedBalance;
+					draft.rewardAddress = rewardAddress;
+					draft.address = bechAddr;
+					draft.network = addressBytes[0] as NetworkId;
+					draft.connectedWallet = toWalletInfo(walletName);
+				})
+			);
+		} catch (e) {
+			console.error(e);
+			set(
+				produce((draft: State) => {
+					draft.isConnecting = false;
+					draft.selectedWallet = null;
+				})
+			);
+		}
+	},
 }));

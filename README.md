@@ -1,8 +1,8 @@
 # use-cardano-wallet
 
-A simple react hook to connect your application to cardano wallets. This library does not take care of transaction building. For that, you should use something like [Lucid](https://github.com/Berry-Pool/lucid).
+A simple react hook to connect your application to cardano wallets. This library does not take care of transaction building. For that, you should use something like [Buildooor](https://github.com/HarmonicLabs/use-cardano-wallet).
 
-> ℹ This library does not depend on `cardano-serialization-lib`, so you don't have to worry about big budle sizes!
+> ℹ This library does not depend on `cardano-serialization-lib`, so you don't have to worry about big bundle sizes!
 
 ## Installation
 
@@ -18,18 +18,18 @@ yarn add @asterium-dev/use-cardano-wallet
 
 ```ts
 const {
-  connect,
-  isConnecting,
-  isConnected,
-  lovelaceBalance,
-  address,
-  network,
-  selectedWallet,
-  connectedWallet,
-  api,
-  disconnect,
-  isRefetchingBalance,
-  refetchBalance,
+	connect,
+	isConnecting,
+	isConnected,
+	lovelaceBalance,
+	address,
+	network,
+	selectedWallet,
+	connectedWallet,
+	api,
+	disconnect,
+	isRefetchingBalance,
+	refetchBalance,
 } = useCardanoWallet();
 ```
 
