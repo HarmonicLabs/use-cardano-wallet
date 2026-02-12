@@ -1,5 +1,5 @@
 import produce from 'immer';
-import create from 'zustand';
+import { create } from 'zustand';
 
 import { NetworkId, WalletApi, WalletName } from '../typescript/cip30';
 import { parseBalance, toWalletInfo } from '../utils';
