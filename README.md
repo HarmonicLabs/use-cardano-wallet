@@ -1,17 +1,15 @@
 # use-cardano-wallet
 
-A simple react hook to connect your application to cardano wallets. This library does not take care of transaction building. For that, you should use something like [Buildooor](https://github.com/HarmonicLabs/use-cardano-wallet).
-
-> ℹ This library does not depend on `cardano-serialization-lib`, so you don't have to worry about big bundle sizes!
+A simple react hook to connect your application to cardano wallets. This library does not take care of transaction building. For that, you should use [Buildooor](https://github.com/HarmonicLabs/buildooor).
 
 ## Installation
 
 ```
-npm i @asterium-dev/use-cardano-wallet
+npm i @harmoniclabs/use-cardano-wallet
 ```
 
 ```
-yarn add @asterium-dev/use-cardano-wallet
+bun i @harmoniclabs/use-cardano-wallet
 ```
 
 ## Basic usage

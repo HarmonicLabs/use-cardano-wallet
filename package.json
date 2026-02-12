@@ -45,6 +45,7 @@
 	"homepage": "https://github.com/HarmonicLabs/use-cardano-wallet#readme",
 	"funding": "https://github.com/sponsors/HarmonicLabs",
 	"dependencies": {
+		"@harmoniclabs/buildooor": "^0.1.28",
 		"@harmoniclabs/cbor": "^1.6.6",
 		"@harmoniclabs/crypto": "^0.3.0",
 		"@harmoniclabs/uint8array-utils": "^1.0.4",

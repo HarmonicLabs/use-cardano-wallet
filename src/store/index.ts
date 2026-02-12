@@ -5,6 +5,7 @@ import { NetworkId, WalletApi, WalletName } from '../typescript/cip30';
 import { parseBalance, toWalletInfo } from '../utils';
 import { fromHex } from '@harmoniclabs/uint8array-utils';
 import { encodeBech32 } from '@harmoniclabs/crypto';
+import { Address } from '@harmoniclabs/buildooor';
 
 export interface WalletInfo {
 	name: WalletName;
@@ -137,7 +138,7 @@ export const useStore = create<State>()((set, get) => ({
 				const buf = fromHex(rewardAddress);
 				rewardAddress = encodeBech32(
 					buf[0] === NetworkId.MAINNET ? 'stake' : 'stake_test',
-					buf.slice(1)
+					buf
 				);
 			}
 
@@ -148,7 +149,7 @@ export const useStore = create<State>()((set, get) => ({
 
 			const bechAddr = encodeBech32(
 				addressBytes[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
-				addressBytes.slice(1)
+				addressBytes
 			);
 
 			localStorage.setItem(localStorageKey, walletName);
