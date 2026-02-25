@@ -39,7 +39,7 @@ export type State = {
 	network: null | NetworkId;
 
 	connect: (walletName: WalletName, localStorageKey: string) => Promise<void>;
-	getDetectedWallets: () => void;
+	getDetectedWallets: () => Promise<void>;
 	disconnect: () => void;
 	refetchBalance: () => Promise<void>;
 };
@@ -177,3 +177,19 @@ export const useStore = create<State>()((set, get) => ({
 		}
 	},
 }));
+export type ReturnVal = {
+	connect: (walletName: WalletName, localStorageKey: string) => Promise<void>;
+	getDetectedWallets: () => Promise<void>;
+	disconnect: () => void;
+	refetchBalance: () => Promise<void>;
+};
+
+export default function useCardanoWallet(): ReturnVal {
+	const store = useStore();
+	return {
+		connect: store.connect,
+		getDetectedWallets: store.getDetectedWallets,
+		disconnect: store.disconnect,
+		refetchBalance: store.refetchBalance,
+	};
+}
