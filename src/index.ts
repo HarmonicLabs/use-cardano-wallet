@@ -34,7 +34,7 @@ type ReturnVal = Omit<State, 'connect' | 'getDetectedWallets'> & {
   connect: (walletName: WalletName) => Promise<void>;
 };
 
-const useCardanoWallet = ({
+export const useCardanoWallet = ({
   autoConnect = true,
   localStorageKey = 'cardano-wallet-name',
 }: UseCardanoWalletOptions = defaultOptions): ReturnVal => {
@@ -80,4 +80,4 @@ const useCardanoWallet = ({
 
 export * from './typescript/cip30';
 
-export default useCardanoWallet;
+// export default useCardanoWallet;
