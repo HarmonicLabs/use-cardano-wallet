@@ -1,6 +1,6 @@
 export enum NetworkId {
-  TESTNET = 0,
-  MAINNET = 1,
+	TESTNET = 0,
+	MAINNET = 1,
 }
 /**
  * A hex-encoded string of the corresponding bytes.
@@ -29,8 +29,8 @@ type CoseSign1CborHex = string;
 type CoseKeyCborHex = string;
 
 export interface Cip30DataSignature {
-  key: CoseKeyCborHex;
-  signature: CoseSign1CborHex;
+	key: CoseKeyCborHex;
+	signature: CoseSign1CborHex;
 }
 
 /**
@@ -56,10 +56,7 @@ export type GetNetworkId = () => Promise<NetworkId>;
  * @throws ApiError
  * @throws PaginateError
  */
-export type GetUtxos = (
-  amount?: Cbor,
-  paginate?: Paginate
-) => Promise<Cbor[] | undefined>;
+export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | undefined>;
 
 /**
  * @returns a list of one or more UTxOs (unspent transaction outputs) controlled by the wallet
@@ -68,9 +65,7 @@ export type GetUtxos = (
  * for transactions with plutus script inputs (pure ADA-only UTxOs).
  * @throws ApiError
  */
-export type GetCollateral = (params?: {
-  amount?: Cbor;
-}) => Promise<Cbor[] | null>;
+export type GetCollateral = (params?: { amount?: Cbor }) => Promise<Cbor[] | null>;
 
 /**
  * Returns the total balance available of the wallet.
@@ -150,10 +145,7 @@ export type SignTx = (tx: Cbor, partialSign?: boolean) => Promise<Cbor>;
  * @throws ApiError
  * @throws DataSignError
  */
-export type SignData = (
-  addr: string,
-  payload: Bytes
-) => Promise<Cip30DataSignature>;
+export type SignData = (addr: string, payload: Bytes) => Promise<Cip30DataSignature>;
 
 /**
  * As wallets should already have this ability, we allow dApps to request that a transaction be sent through it.
@@ -168,39 +160,68 @@ export type SignData = (
  */
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
+/**
+ * Request for signing a single transaction in bulk operations, as per CIP-0103.
+ */
+export type TransactionSignatureRequest = {
+	cbor: Cbor;
+	partialSign?: boolean;
+};
+
+/**
+ * Experimental API for bulk transaction signing, as per CIP-0103.
+ * Signs multiple transactions and returns their witness sets.
+ *
+ * @throws ApiError
+ * @throws TxSignError
+ */
+export type SignTxs = (txs: TransactionSignatureRequest[]) => Promise<Cbor[]>;
+
 export enum WalletName {
-  NAMI = 'nami',
-  ETERNL = 'eternl',
-  FLINT = 'flint',
-  BEGIN = 'begin',
-  GERO = 'gero',
-  TYPHON = 'typhoncip30',
-  LACE = 'lace',
-  VESPR = 'vespr',
+	NAMI = 'nami',
+	ETERNL = 'eternl',
+	FLINT = 'flint',
+	BEGIN = 'begin',
+	GERO = 'gero',
+	TYPHON = 'typhoncip30',
+	LACE = 'lace',
+	VESPR = 'vespr',
 }
 
 export interface WalletApi {
-  getNetworkId: GetNetworkId;
+	getNetworkId: GetNetworkId;
 
-  getUtxos: GetUtxos;
+	getUtxos: GetUtxos;
 
-  getBalance: GetBalance;
+	getBalance: GetBalance;
 
-  getCollateral: GetCollateral;
+	getCollateral: GetCollateral;
 
-  getUsedAddresses: GetUsedAddresses;
+	getUsedAddresses: GetUsedAddresses;
 
-  getUnusedAddresses: GetUnusedAddresses;
+	getUnusedAddresses: GetUnusedAddresses;
 
-  getChangeAddress: GetChangeAddress;
+	getChangeAddress: GetChangeAddress;
 
-  getRewardAddresses: GetRewardAddresses;
+	getRewardAddresses: GetRewardAddresses;
 
-  signTx: SignTx;
+	signTx: SignTx;
 
-  signData: SignData;
+	signData: SignData;
 
-  submitTx: SubmitTx;
+	submitTx: SubmitTx;
+
+	/**
+	 * Experimental API for bulk transaction signing (CIP-0103).
+	 * Some wallets like Eternl may implement this, but it's not required.
+	 */ experimental?: {
+		signTxs: SignTxs;
+	};
+	/**
+	 * Signs multiple transactions (bulk signing).
+	 * Some wallets like [list wallets here] support this.
+	 */
+	signTxs: SignTxs;
 }
 
 export type WalletMethod = keyof WalletApi;
