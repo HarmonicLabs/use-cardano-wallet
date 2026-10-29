@@ -134,8 +134,10 @@ export const useStore = create<State>()((set, get) => ({
 
       if (rewardAddress) {
         const buf = fromHex(rewardAddress);
+        // network id is the low nibble of the address header byte
+        // (a mainnet reward address header is 0xe1, not 0x01)
         rewardAddress = encodeBech32(
-          buf[0] === NetworkId.MAINNET ? 'stake' : 'stake_test',
+          (buf[0] & 0x0f) === NetworkId.MAINNET ? 'stake' : 'stake_test',
           buf
         );
       }
@@ -146,7 +148,7 @@ export const useStore = create<State>()((set, get) => ({
       const decodedBalance = parseBalance(balance);
 
       const bechAddr = encodeBech32(
-        addressBytes[0] === NetworkId.MAINNET ? 'addr' : 'addr_test',
+        (addressBytes[0] & 0x0f) === NetworkId.MAINNET ? 'addr' : 'addr_test',
         addressBytes
       );
 
@@ -160,7 +162,7 @@ export const useStore = create<State>()((set, get) => ({
           draft.lovelaceBalance = decodedBalance;
           draft.rewardAddress = rewardAddress;
           draft.address = bechAddr;
-          draft.network = addressBytes[0] as NetworkId;
+          draft.network = (addressBytes[0] & 0x0f) as NetworkId;
           draft.connectedWallet = toWalletInfo(walletName);
         })
       );
