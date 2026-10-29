@@ -1,7 +1,7 @@
 {
   "name": "@harmoniclabs/use-cardano-wallet",
   "author": "Harmonic Labs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -16,8 +16,9 @@
   },
   "scripts": {
     "start": "tsdx watch",
-    "build": "tsc --project tsconfig.json",
-    "test": "tsdx test --passWithNoTests",
+    "build": "rm -rf dist && tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsdx test",
     "lint": "tsdx lint",
     "prepare": "npm run build",
     "size": "size-limit",
@@ -54,10 +55,11 @@
     "tsdx": "^2.0.0",
     "tslib": "^2.8.1",
     "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
   },
   "dependencies": {
-    "@harmoniclabs/cbor": "^2.0.2",
+    "@harmoniclabs/cbor": "^2.1.0",
     "@harmoniclabs/crypto": "^0.3.1",
     "@harmoniclabs/uint8array-utils": "^1.0.4",
     "immer": "^9.0.21",
