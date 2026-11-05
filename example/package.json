@@ -8,7 +8,7 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
-    "@harmoniclabs/buildooor": "^0.1.28",
+    "@harmoniclabs/buildooor": "^0.2.10",
     "react-app-polyfill": "^1.0.0"
   },
   "alias": {
